@@ -29,9 +29,8 @@ class BookController extends Controller
         };
 
 
-        $cacheKey = 'books' . $filter . ':' . $title;
-        // $books = cache()->remember($cacheKey, 3600, fn() => $books->paginate(20));
-        $books = $books->paginate(20)->appends(request()->query());
+        $cacheKey = 'books:' . $filter . ':' . $title;
+        $books = cache()->remember($cacheKey, 3600, fn() => $books->paginate(20)->appends(request()->query()));
 
         
 
@@ -60,7 +59,10 @@ class BookController extends Controller
      */
     public function show(int $id)
     {
-        $cacheKey = 'books' . $id;
+        // the reason i didnt used route model binding is for caching properly. if i used it, then every single time laravel would fetch
+        // the book and reviews from DB. but now, it first checks the cache memory and if it wasn't available in it, then it fetches book
+        // from DB.
+        $cacheKey = 'book:' . $id;
         $book = cache()->remember(
             $cacheKey, 
             3600 , 
