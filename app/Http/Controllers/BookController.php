@@ -15,6 +15,8 @@ class BookController extends Controller
     {
         $title = $request->input('title');
         $filter = $request->input('filter', '');
+        $page = $request->input('page');
+
 
         $books = Book::when($title, function($query, $title) {
             return $query->title($title);
@@ -29,7 +31,7 @@ class BookController extends Controller
         };
 
 
-        $cacheKey = 'books:' . $filter . ':' . $title;
+        $cacheKey = 'books:' . $filter . ':' . $title . ':' . $page;
         $books = cache()->remember($cacheKey, 3600, fn() => $books->paginate(20)->appends(request()->query()));
 
         
